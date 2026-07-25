@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 type CardRow = {
   id: string;
@@ -68,6 +69,11 @@ export default function AdminDashboard() {
     <main className="min-h-screen px-8 py-6">
       <header className="flex items-center justify-between mb-6">
         <div className="text-ko-whistle text-xs tracking-widest font-display">KICK OFF · ADMIN</div>
+        <nav className="flex gap-4 text-sm">
+          <Link href="/admin" className="text-ko-whistle">Dashboard</Link>
+          <Link href="/admin/clients" className="text-ko-line/60 hover:text-ko-line">Clienti</Link>
+          <Link href="/admin/audit" className="text-ko-line/60 hover:text-ko-line">Audit log</Link>
+        </nav>
       </header>
 
       <div className="grid grid-cols-3 gap-4 mb-8">

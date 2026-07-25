@@ -12,6 +12,12 @@
 - Audit log automatico su ogni azione sensibile
 - Pannello admin: caricamento nuove card in lotto, creazione account
   reception, vista card/stato
+- Pannello admin → **Clienti**: ricerca anagrafica, dettaglio cliente con
+  storico completo pacchetti (anche chiusi/scaduti) e storico ingressi
+- Pannello admin → **Audit log**: registro filtrabile di ogni azione, con
+  nome dell'operatore (admin o reception) che l'ha eseguita
+- Annullamento ingresso errato: direttamente dalla scheda cliente
+  (`/admin/clients/[id]`), riservato all'admin
 
 ## Cosa manca (fasi successive, come da documento architetturale)
 
@@ -19,10 +25,6 @@
   vista card + pacchetti + storico da smartphone
 - **Fase 3**: notifiche email (Resend) — acquisto, promemoria scadenza, scaduto
 - **Fase 4**: Apple Wallet / Google Wallet
-- Pagina admin per annullare un ingresso errato (l'API `/api/admin/entry-logs/[id]/reverse`
-  esiste già, manca solo l'interfaccia per cercarlo e richiamarla)
-- Pagina admin "Audit log" (la tabella esiste ed è già popolata da ogni azione,
-  manca solo la vista di consultazione)
 - Job di scadenza pacchetti (cron giornaliero che marca `status='expired'`
   i pacchetti oltre `expiry_date` e alimenta le notifiche di Fase 3)
 - Primo account admin: va creato manualmente in Supabase Auth, poi bisogna
