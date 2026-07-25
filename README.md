@@ -33,15 +33,28 @@
   KO-4F82 associata a Mario Rossi", "3 ingressi scalati su Padel — 7
   rimasti") invece del JSON grezzo, con badge per distinguere admin da
   reception
+- **Area cliente (Fase 2)**: registrazione ed accesso via email/password
+  (Supabase Auth), collegamento al proprio profilo tramite codice fiscale al
+  primo accesso, dashboard mobile-first con tessera digitale (barcode reale
+  Code128, scansionabile in reception anche senza la card fisica), pacchetti
+  attivi/storico, ultimi ingressi. Le query passano direttamente dal browser
+  con le RLS policy — nessuna API intermedia necessaria per la lettura
 
 ## Cosa manca (fasi successive, come da documento architetturale)
 
-- **Fase 2**: registrazione/area cliente, collegamento via codice fiscale,
-  vista card + pacchetti + storico da smartphone
 - **Fase 3**: notifiche email (Resend) — acquisto, promemoria scadenza, scaduto
 - **Fase 4**: Apple Wallet / Google Wallet
 - Job di scadenza pacchetti (cron giornaliero che marca `status='expired'`
   i pacchetti oltre `expiry_date` e alimenta le notifiche di Fase 3)
+
+## Nota Supabase Auth — conferma email
+
+Per impostazione predefinita Supabase richiede la conferma via email prima
+di attivare la sessione al momento della registrazione. Due opzioni:
+- lasciarlo attivo (il cliente riceve un'email, clicca il link, poi fa login) — comportamento già gestito dalla pagina di registrazione
+- disattivarlo da **Authentication → Providers → Email → Confirm email**
+  (dashboard web, nessun codice) se preferisci che l'account sia subito
+  attivo senza passaggio email
 - Primo account admin: va creato manualmente in Supabase Auth, poi bisogna
   inserire la riga corrispondente in `admins` con lo stesso `id`
 

@@ -24,9 +24,23 @@ export async function middleware(req: NextRequest) {
     }
   }
 
+  if (
+    pathname.startsWith("/cliente") &&
+    !pathname.startsWith("/cliente/login") &&
+    !pathname.startsWith("/cliente/registrati")
+  ) {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.redirect(new URL("/cliente/login", req.url));
+    }
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/reception/:path*", "/admin/:path*"],
+  matcher: ["/reception/:path*", "/admin/:path*", "/cliente/:path*"],
 };
