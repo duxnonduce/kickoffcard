@@ -64,7 +64,12 @@ export default function ClienteDashboard() {
       ]);
 
       setCards(cardsData ?? []);
-      setPackages(pkgData ?? []);
+      setPackages(
+        (pkgData ?? []).map((p: any) => ({
+          ...p,
+          sports: Array.isArray(p.sports) ? p.sports[0] ?? null : p.sports,
+        }))
+      );
       setEntryLogs(logsData ?? []);
       setLoading(false);
     })();
