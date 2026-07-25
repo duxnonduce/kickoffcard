@@ -1,25 +1,42 @@
 "use client";
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import AdminNav from "../_components/AdminNav";
 
 type LogRow = {
   id: string;
-  actor_type: string;
+  actor_type: "admin" | "receptionist";
   actor_name: string;
   action: string;
   entity_type: string;
   entity_id: string;
-  detail: Record<string, unknown>;
+  detail: Record<string, any>;
   created_at: string;
 };
 
-const actionLabel: Record<string, string> = {
-  card_linked: "Card associata a cliente",
-  package_sold: "Pacchetto venduto",
-  entry_deducted: "Ingresso scalato",
-  entry_reversed: "Ingresso annullato",
-  cards_batch_created: "Lotto card creato",
-  receptionist_created: "Account reception creato",
+function summarize(l: LogRow): string {
+  const d = l.detail || {};
+  switch (l.action) {
+    case "card_linked":
+      return `Card ${d.barcode ?? "—"} associata a ${d.clientName ?? "cliente"}`;
+    case "package_sold":
+      return `Pacchetto ${d.sportName ?? ""} venduto: ${d.totalEntries} ingressi a €${Number(d.price ?? 0).toFixed(2)}${d.expiryDate ? `, scadenza ${new Date(d.expiryDate).toLocaleDateString("it-IT")}` : ""}`;
+    case "package_updated":
+      return `Pacchetto ${d.sportName ?? ""} modificato${d.barcode ? ` (card ${d.barcode})` : ""}`;
+    case "entry_deducted":
+      return `${d.entriesDeducted} ingresso/i scalato/i su ${d.sportName ?? "pacchetto"} — ${d.remainingAfter} rimasti`;
+    case "entry_reversed":
+      return `Ingresso ripristinato su ${d.sportName ?? "pacchetto"} (+${d.restoredEntries})`;
+    case "cards_batch_created":
+      return `${d.count} card create${d.batchLabel ? ` — lotto: ${d.batchLabel}` : ""}`;
+    case "receptionist_created":
+      return `Account reception creato: ${d.fullName}`;
+    default:
+      return l.action;
+  }
+}
+
+const entityLabel: Record<string, string> = {
+  card: "Card", package: "Pacchetto", entry_log: "Ingresso", client: "Cliente",
 };
 
 export default function AdminAuditPage() {
@@ -42,16 +59,10 @@ export default function AdminAuditPage() {
 
   return (
     <main className="min-h-screen px-8 py-6">
-      <header className="flex items-center justify-between mb-6">
-        <div className="text-ko-whistle text-xs tracking-widest font-display">KICK OFF · ADMIN</div>
-        <nav className="flex gap-4 text-sm">
-          <Link href="/admin" className="text-ko-line/60 hover:text-ko-line">Dashboard</Link>
-          <Link href="/admin/clients" className="text-ko-line/60 hover:text-ko-line">Clienti</Link>
-          <Link href="/admin/audit" className="text-ko-whistle">Audit log</Link>
-        </nav>
-      </header>
+      <AdminNav />
 
-      <h1 className="font-display text-3xl mb-4">Registro attività</h1>
+      <h1 className="font-display text-3xl mb-1">Registro attività</h1>
+      <p className="text-ko-line/50 text-sm mb-6">Ogni azione rilevante, con chi l'ha eseguita e quando.</p>
 
       <div className="flex gap-3 mb-6">
         <select className="bg-ko-ink border border-ko-line/20 rounded-lg py-2 px-3" value={entityType} onChange={(e) => setEntityType(e.target.value)}>
@@ -68,22 +79,29 @@ export default function AdminAuditPage() {
         </select>
       </div>
 
-      <table className="w-full text-sm">
-        <thead className="text-ko-line/50 text-left">
-          <tr><th className="pb-2">Data</th><th>Azione</th><th>Operatore</th><th>Dettaglio</th></tr>
-        </thead>
-        <tbody>
-          {logs.map((l) => (
-            <tr key={l.id} className="border-t border-ko-line/10 align-top">
-              <td className="py-2 whitespace-nowrap">{new Date(l.created_at).toLocaleString("it-IT")}</td>
-              <td>{actionLabel[l.action] ?? l.action}</td>
-              <td>{l.actor_name} <span className="text-ko-line/40">({l.actor_type === "admin" ? "admin" : "reception"})</span></td>
-              <td className="font-mono text-xs text-ko-line/60">{JSON.stringify(l.detail)}</td>
-            </tr>
-          ))}
-          {logs.length === 0 && <tr><td colSpan={4} className="text-ko-line/50 py-6 text-center">Nessuna attività registrata.</td></tr>}
-        </tbody>
-      </table>
+      <div className="flex flex-col gap-2">
+        {logs.map((l) => (
+          <div key={l.id} className="flex items-start gap-4 bg-ko-field/20 border border-ko-line/10 rounded-xl px-4 py-3">
+            <div className="text-xs text-ko-line/40 font-mono whitespace-nowrap pt-0.5 w-36 shrink-0">
+              {new Date(l.created_at).toLocaleDateString("it-IT")}
+              <br />
+              {new Date(l.created_at).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}
+            </div>
+            <div className="flex-1">
+              <div className="text-sm">{summarize(l)}</div>
+              <div className="text-xs text-ko-line/40 mt-1">{entityLabel[l.entity_type] ?? l.entity_type}</div>
+            </div>
+            <div
+              className={`text-xs px-2.5 py-1 rounded-full whitespace-nowrap ${
+                l.actor_type === "admin" ? "bg-ko-whistle/20 text-ko-whistle" : "bg-ko-fieldLight/30 text-ko-line/80"
+              }`}
+            >
+              {l.actor_name}
+            </div>
+          </div>
+        ))}
+        {logs.length === 0 && <div className="text-ko-line/50 py-10 text-center">Nessuna attività registrata.</div>}
+      </div>
     </main>
   );
 }

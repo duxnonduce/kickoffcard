@@ -9,9 +9,9 @@ export async function POST(req: NextRequest) {
   const actor = await requireActor();
   if (!actor) return NextResponse.json({ error: "Non autorizzato" }, { status: 401 });
 
-  const { barcode, sportId, totalEntries, price, expiryDate } = await req.json();
+  const { barcode, cardId, sportId, totalEntries, price, expiryDate } = await req.json();
 
-  if (!barcode || !sportId || !totalEntries || price === undefined) {
+  if ((!barcode && !cardId) || !sportId || !totalEntries || price === undefined) {
     return NextResponse.json({ error: "Dati pacchetto incompleti" }, { status: 400 });
   }
   if (totalEntries < 1) {
@@ -19,11 +19,10 @@ export async function POST(req: NextRequest) {
   }
 
   const admin = createAdminClient();
-  const { data: card } = await admin
-    .from("cards")
-    .select("id, status, client_id")
-    .eq("barcode", barcode)
-    .maybeSingle();
+  const cardQuery = admin.from("cards").select("id, status, client_id");
+  const { data: card } = cardId
+    ? await cardQuery.eq("id", cardId).maybeSingle()
+    : await cardQuery.eq("barcode", barcode).maybeSingle();
 
   if (!card) return NextResponse.json({ error: "Card non trovata" }, { status: 404 });
   if (card.status !== "associata" || !card.client_id) {
@@ -54,7 +53,7 @@ export async function POST(req: NextRequest) {
     action: "package_sold",
     entityType: "package",
     entityId: pkg.id,
-    detail: { barcode, sportId, totalEntries, price, expiryDate },
+    detail: { barcode: barcode ?? null, cardId: cardId ?? card.id, sportId, totalEntries, price, expiryDate },
   });
 
   // Fase 3: qui verrà accodata la notifica email "acquisto" al cliente.

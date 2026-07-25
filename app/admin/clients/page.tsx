@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import AdminNav from "../_components/AdminNav";
 
 type ClientRow = {
   id: string;
@@ -27,14 +28,7 @@ export default function AdminClientsPage() {
 
   return (
     <main className="min-h-screen px-8 py-6">
-      <header className="flex items-center justify-between mb-6">
-        <div className="text-ko-whistle text-xs tracking-widest font-display">KICK OFF · ADMIN</div>
-        <nav className="flex gap-4 text-sm">
-          <Link href="/admin" className="text-ko-line/60 hover:text-ko-line">Dashboard</Link>
-          <Link href="/admin/clients" className="text-ko-whistle">Clienti</Link>
-          <Link href="/admin/audit" className="text-ko-line/60 hover:text-ko-line">Audit log</Link>
-        </nav>
-      </header>
+      <AdminNav />
 
       <h1 className="font-display text-3xl mb-4">Anagrafica clienti</h1>
       <div className="flex gap-3 mb-6 max-w-lg">

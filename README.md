@@ -18,6 +18,21 @@
   nome dell'operatore (admin o reception) che l'ha eseguita
 - Annullamento ingresso errato: direttamente dalla scheda cliente
   (`/admin/clients/[id]`), riservato all'admin
+- **Menu admin condiviso** (`/admin/_components/AdminNav.tsx`): stessa barra
+  su tutte le pagine, con nome dell'admin loggato e stato attivo per sezione
+- **Pannello admin → Operazioni** (`/admin/operazioni`): l'admin ha lo stesso
+  potere della reception — può scansionare/digitare un codice, associare
+  manualmente una card a un cliente, vendere un pacchetto, fare check-in
+- **Modifica pacchetti già venduti**: dalla scheda cliente, pulsante
+  "Modifica" su ogni pacchetto per correggere sport, ingressi totali/residui,
+  prezzo, scadenza (riservato all'admin)
+- **Nuovo pacchetto senza scansione**: dalla scheda cliente, pulsante
+  "+ Nuovo pacchetto" per assegnarne uno a una delle card del cliente
+  direttamente, senza passare dallo scan
+- **Audit log leggibile**: ogni riga ora è una frase in italiano (es. "Card
+  KO-4F82 associata a Mario Rossi", "3 ingressi scalati su Padel — 7
+  rimasti") invece del JSON grezzo, con badge per distinguere admin da
+  reception
 
 ## Cosa manca (fasi successive, come da documento architetturale)
 
