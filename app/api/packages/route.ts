@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireActor } from "@/lib/auth/actorGuard";
 import { logAudit } from "@/lib/audit";
+import { sendPurchaseEmail } from "@/lib/email";
 
 // Vendita di un nuovo pacchetto su una card già associata a un cliente.
 // Una card può avere più pacchetti attivi in parallelo, uno per sport.
@@ -56,7 +57,29 @@ export async function POST(req: NextRequest) {
     detail: { barcode: barcode ?? null, cardId: cardId ?? card.id, sportId, totalEntries, price, expiryDate },
   });
 
-  // Fase 3: qui verrà accodata la notifica email "acquisto" al cliente.
+  // Notifica email di acquisto (solo se il cliente ha un'email valida)
+  const { data: clientRow } = await admin
+    .from("clients")
+    .select("email, first_name")
+    .eq("id", card.client_id)
+    .maybeSingle();
+  const { data: sportRow } = await admin.from("sports").select("name").eq("id", sportId).maybeSingle();
+
+  if (clientRow?.email && sportRow?.name) {
+    await sendPurchaseEmail({
+      to: clientRow.email,
+      firstName: clientRow.first_name,
+      sportName: sportRow.name,
+      totalEntries,
+      price,
+      expiryDate: expiryDate || null,
+    });
+    await admin.from("notifications").insert({
+      client_id: card.client_id,
+      package_id: pkg.id,
+      type: "acquisto",
+    });
+  }
 
   return NextResponse.json({ ok: true, packageId: pkg.id });
 }

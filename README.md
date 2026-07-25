@@ -39,13 +39,41 @@
   Code128, scansionabile in reception anche senza la card fisica), pacchetti
   attivi/storico, ultimi ingressi. Le query passano direttamente dal browser
   con le RLS policy — nessuna API intermedia necessaria per la lettura
+- **Notifiche email (Fase 3)**: email automatica al cliente quando gli viene
+  assegnato un nuovo pacchetto; promemoria di scadenza a 7 e a 2 giorni;
+  email quando un pacchetto scade (e il sistema lo marca automaticamente
+  `expired`). Il tutto gestito da un cron giornaliero su Vercel — nessun
+  server da tenere acceso
 
 ## Cosa manca (fasi successive, come da documento architetturale)
 
-- **Fase 3**: notifiche email (Resend) — acquisto, promemoria scadenza, scaduto
 - **Fase 4**: Apple Wallet / Google Wallet
-- Job di scadenza pacchetti (cron giornaliero che marca `status='expired'`
-  i pacchetti oltre `expiry_date` e alimenta le notifiche di Fase 3)
+
+## Setup — Fase 3: email (Resend + Vercel Cron)
+
+**1. Resend (dashboard web)**
+- Crea un account su resend.com
+- Aggiungi e verifica il tuo dominio (o sottodominio, es. `notifiche.kickoff.it`)
+  in **Domains** — Resend ti mostra dei record DNS da aggiungere dal
+  pannello del tuo registrar (anche questo via web, nessun terminale)
+- Crea una **API Key** da **API Keys**
+
+**2. Vercel — Environment Variables**
+- `RESEND_API_KEY`: la chiave appena creata
+- `KICKOFF_FROM_EMAIL`: es. `Kick Off <notifiche@notifiche.kickoff.it>`
+  (deve usare il dominio verificato su Resend)
+- `CRON_SECRET`: una stringa lunga a caso — Vercel la invia automaticamente
+  come autenticazione ogni volta che esegue il cron, così nessun altro può
+  chiamare quell'endpoint dall'esterno
+
+Il cron (`vercel.json`, già incluso) gira una volta al giorno alle 7:00 UTC
+e non richiede nessuna configurazione aggiuntiva: parte da solo al primo
+deploy. Se il tuo piano Vercel è Hobby, il limite è comunque di 1
+esecuzione/giorno per cron job, quindi va bene così com'è.
+
+**Nota**: finché `RESEND_API_KEY` non è impostata, il sistema di notifiche
+resta silenziosamente disattivato (utile per testare senza inviare email
+per sbaglio) — tutto il resto dell'app continua a funzionare normalmente.
 
 ## Nota Supabase Auth — conferma email
 
@@ -80,6 +108,7 @@ di attivare la sessione al momento della registrazione. Due opzioni:
   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
   - `SUPABASE_SERVICE_ROLE_KEY`
   - `RECEPTION_SESSION_SECRET` (una stringa lunga a caso, es. generata da un password manager)
+  - `RESEND_API_KEY`, `KICKOFF_FROM_EMAIL`, `CRON_SECRET` (vedi sezione notifiche email qui sotto — puoi anche lasciarle vuote all'inizio e aggiungerle quando attivi le notifiche)
 - **Deploy**
 
 Fatto: il sito è online. Ogni volta che ti preparo dei file aggiornati, basta ricaricarli su GitHub (sovrascrivendo quelli esistenti) e Vercel rifà il deploy da solo.
