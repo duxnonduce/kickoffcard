@@ -79,6 +79,8 @@ export async function POST(req: NextRequest) {
       package_id: pkg.id,
       type: "acquisto",
     });
+  } else {
+    console.warn("[email] Nessuna email per il cliente " + card.client_id + ": notifica acquisto saltata");
   }
 
   return NextResponse.json({ ok: true, packageId: pkg.id });

@@ -7,8 +7,8 @@ const body = Inter({ subsets: ["latin"], variable: "--font-body" });
 const mono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["500", "600"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
-  title: "Kick Off — Gestione tessere e ingressi",
-  description: "Sistema tessere, pacchetti e ingressi multi-sport",
+  title: "Kickoff Sport Center — Portale Card Fedeltà",
+  description: "Gestione tessere, pacchetti e ingressi multi-sport",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

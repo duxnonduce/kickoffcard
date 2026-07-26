@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/browser";
+import Logo from "@/components/Logo";
 
 export default function ClienteRegistratiPage() {
   const [email, setEmail] = useState("");
@@ -28,8 +29,10 @@ export default function ClienteRegistratiPage() {
   return (
     <main className="min-h-screen flex items-center justify-center px-6 py-10">
       <div className="bg-ko-field/40 border border-ko-line/10 rounded-2xl p-7 w-full max-w-sm">
-        <div className="text-ko-whistle text-xs tracking-widest font-display mb-2">KICK OFF</div>
-        <h1 className="font-display text-3xl mb-6">Crea il tuo account</h1>
+        <div className="flex justify-center mb-6">
+          <Logo size="md" />
+        </div>
+        <h1 className="font-display text-2xl mb-6 text-center">Crea il tuo account</h1>
 
         {step === "form" && (
           <>

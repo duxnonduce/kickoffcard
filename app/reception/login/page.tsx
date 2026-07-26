@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Logo from "@/components/Logo";
 
 export default function ReceptionLoginPage() {
   const [pin, setPin] = useState("");
@@ -28,8 +29,10 @@ export default function ReceptionLoginPage() {
   return (
     <main className="min-h-screen flex items-center justify-center px-6">
       <div className="bg-ko-field/40 border border-ko-line/10 rounded-2xl p-8 w-full max-w-sm">
-        <div className="text-ko-whistle text-xs tracking-widest font-display mb-2">KICK OFF · RECEPTION</div>
-        <h1 className="font-display text-3xl mb-6">Inserisci il PIN</h1>
+        <div className="flex justify-center mb-6">
+          <Logo size="md" />
+        </div>
+        <h1 className="font-display text-2xl mb-6 text-center">Accesso Reception</h1>
         <input
           className="w-full text-center text-2xl font-mono tracking-widest bg-ko-ink border border-ko-line/20 rounded-lg py-3 mb-4"
           inputMode="numeric"

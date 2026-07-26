@@ -3,6 +3,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/browser";
+import Logo from "@/components/Logo";
 
 const links = [
   { href: "/admin", label: "Dashboard" },
@@ -38,11 +39,7 @@ export default function AdminNav() {
     <header className="sticky top-0 z-20 -mx-8 px-8 py-4 mb-8 bg-ko-ink/90 backdrop-blur border-b border-ko-line/10">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-8">
-          <div className="flex items-center gap-2">
-            <div className="w-2.5 h-2.5 rounded-full bg-ko-whistle" />
-            <span className="text-ko-whistle text-xs tracking-widest font-display">KICK OFF</span>
-            <span className="text-ko-line/30 text-xs">/ admin</span>
-          </div>
+          <Logo size="sm" align="left" />
           <nav className="flex gap-1">
             {links.map((l) => (
               <Link

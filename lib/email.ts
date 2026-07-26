@@ -20,7 +20,10 @@ function wrapper(title: string, bodyHtml: string) {
 export async function sendPurchaseEmail(params: {
   to: string; firstName: string; sportName: string; totalEntries: number; price: number; expiryDate: string | null;
 }) {
-  if (!process.env.RESEND_API_KEY) return; // in sviluppo senza chiave configurata, salta silenziosamente
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("[email] RESEND_API_KEY non impostata: invio saltato (acquisto)");
+    return;
+  }
   const html = wrapper(
     "Nuovo pacchetto attivato",
     `<p>Ciao ${params.firstName},</p>
@@ -29,13 +32,23 @@ export async function sendPurchaseEmail(params: {
      ${params.expiryDate ? `<p>Scadenza: ${new Date(params.expiryDate).toLocaleDateString("it-IT")}.</p>` : ""}
      <p>Puoi vedere lo stato aggiornato in ogni momento nella tua area riservata.</p>`
   );
-  await resend().emails.send({ from: FROM, to: params.to, subject: `Nuovo pacchetto ${params.sportName} attivato`, html });
+  const { error } = await resend().emails.send({
+    from: FROM,
+    to: params.to,
+    subject: `Nuovo pacchetto ${params.sportName} attivato`,
+    html,
+    text: `Ciao ${params.firstName},\n\nabbiamo attivato sulla tua tessera un nuovo pacchetto ${params.sportName}: ${params.totalEntries} ingressi, €${params.price.toFixed(2)}.${params.expiryDate ? ` Scadenza: ${new Date(params.expiryDate).toLocaleDateString("it-IT")}.` : ""}\n\nPuoi vedere lo stato aggiornato nella tua area riservata Kick Off.`,
+  });
+  if (error) console.error("[email] Errore invio email acquisto:", JSON.stringify(error));
 }
 
 export async function sendExpiryReminderEmail(params: {
   to: string; firstName: string; sportName: string; daysLeft: number; expiryDate: string;
 }) {
-  if (!process.env.RESEND_API_KEY) return;
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("[email] RESEND_API_KEY non impostata: invio saltato (promemoria)");
+    return;
+  }
   const html = wrapper(
     "Il tuo pacchetto sta per scadere",
     `<p>Ciao ${params.firstName},</p>
@@ -43,16 +56,33 @@ export async function sendExpiryReminderEmail(params: {
      (${new Date(params.expiryDate).toLocaleDateString("it-IT")}).</p>
      <p>Passa in reception se vuoi rinnovarlo o completare gli ingressi rimasti.</p>`
   );
-  await resend().emails.send({ from: FROM, to: params.to, subject: `Il tuo pacchetto ${params.sportName} scade tra ${params.daysLeft} giorni`, html });
+  const { error } = await resend().emails.send({
+    from: FROM,
+    to: params.to,
+    subject: `Il tuo pacchetto ${params.sportName} scade tra ${params.daysLeft} giorni`,
+    html,
+    text: `Ciao ${params.firstName},\n\nil tuo pacchetto ${params.sportName} scade tra ${params.daysLeft} giorni (${new Date(params.expiryDate).toLocaleDateString("it-IT")}).\n\nPassa in reception se vuoi rinnovarlo o completare gli ingressi rimasti.`,
+  });
+  if (error) console.error("[email] Errore invio email promemoria:", JSON.stringify(error));
 }
 
 export async function sendExpiredEmail(params: { to: string; firstName: string; sportName: string }) {
-  if (!process.env.RESEND_API_KEY) return;
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("[email] RESEND_API_KEY non impostata: invio saltato (scaduto)");
+    return;
+  }
   const html = wrapper(
     "Pacchetto scaduto",
     `<p>Ciao ${params.firstName},</p>
      <p>il tuo pacchetto <strong>${params.sportName}</strong> è scaduto. Se vuoi continuare a giocare,
      passa in reception per attivarne uno nuovo.</p>`
   );
-  await resend().emails.send({ from: FROM, to: params.to, subject: `Il tuo pacchetto ${params.sportName} è scaduto`, html });
+  const { error } = await resend().emails.send({
+    from: FROM,
+    to: params.to,
+    subject: `Il tuo pacchetto ${params.sportName} è scaduto`,
+    html,
+    text: `Ciao ${params.firstName},\n\nil tuo pacchetto ${params.sportName} è scaduto. Se vuoi continuare a giocare, passa in reception per attivarne uno nuovo.`,
+  });
+  if (error) console.error("[email] Errore invio email scaduto:", JSON.stringify(error));
 }

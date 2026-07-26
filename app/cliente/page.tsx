@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import JsBarcode from "jsbarcode";
 import { createClient } from "@/lib/supabase/browser";
+import Logo from "@/components/Logo";
 
 type ClientProfile = { id: string; first_name: string; last_name: string; codice_fiscale: string; email: string | null; phone: string | null };
 type CardRow = { id: string; barcode: string; status: string };
@@ -89,7 +90,7 @@ export default function ClienteDashboard() {
   return (
     <main className="min-h-screen px-4 py-6 max-w-md mx-auto">
       <header className="flex items-center justify-between mb-5">
-        <div className="text-ko-whistle text-xs tracking-widest font-display">KICK OFF</div>
+        <Logo size="sm" align="left" />
         <button onClick={logout} className="text-sm text-ko-line/50">Esci</button>
       </header>
 

@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Logo from "@/components/Logo";
 
 export default function ClienteCollegaPage() {
   const [cf, setCf] = useState("");
@@ -23,8 +24,10 @@ export default function ClienteCollegaPage() {
   return (
     <main className="min-h-screen flex items-center justify-center px-6 py-10">
       <div className="bg-ko-field/40 border border-ko-line/10 rounded-2xl p-7 w-full max-w-sm">
-        <div className="text-ko-whistle text-xs tracking-widest font-display mb-2">KICK OFF</div>
-        <h1 className="font-display text-3xl mb-3">Un ultimo passo</h1>
+        <div className="flex justify-center mb-6">
+          <Logo size="md" />
+        </div>
+        <h1 className="font-display text-2xl mb-3 text-center">Un ultimo passo</h1>
         <p className="text-sm text-ko-line/60 mb-5">
           Inserisci il codice fiscale che hai lasciato in reception: troveremo subito le tue card e i tuoi pacchetti.
         </p>
